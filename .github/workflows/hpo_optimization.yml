@@ -1,0 +1,54 @@
+name: Hyperparameter Optimization Pipeline
+
+on:
+  workflow_dispatch:  # Allows manual triggering with custom input
+    inputs:
+      script_path:
+        description: "Path to the script that provides data and model"
+        required: false  # Make it optional
+        default: ""  # No default when run manually
+
+  push:  # Automatically trigger on push
+    branches:
+      - main
+
+jobs:
+  hpo_pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Check out the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Python environment
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    # Step 4: Determine script path
+    - name: Set Script Path
+      id: set_script_path
+      run: |
+        if [[ -n "${{ github.event.inputs.script_path }}" ]]; then
+          echo "Using manual script path: ${{ github.event.inputs.script_path }}"
+          echo "SCRIPT_PATH=${{ github.event.inputs.script_path }}" >> $GITHUB_ENV
+        else
+          echo "Using default script path from GitHub variable."
+          echo "SCRIPT_PATH=${{ vars.SCRIPT_PATH }}" >> $GITHUB_ENV
+        fi
+
+    # Step 5: Run the pipeline with configurable script path
+    - name: Run Hyperparameter Optimization
+      env:
+        SCRIPT_PATH: ${{ env.SCRIPT_PATH }}
+      run: |
+        echo "Running HPO using script at: $SCRIPT_PATH"
+        python ./.github/workflows/hpo_optimization.py
