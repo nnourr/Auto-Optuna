@@ -28,6 +28,12 @@ PARAM_BOUNDS = {
             "DecisionTreeRegressor": ["squared_error", "friedman_mse", "absolute_error", "poisson"],
         },
     },  # Split quality function
+    "class_weight": {
+        "type": "categorical",
+        "options": {
+            "DecisionTreeClassifier": ["balanced", None],  # Only applicable to classifiers
+        },
+    },  # Class weights
     "splitter": {"type": "categorical", "options": ["best", "random"]},  # Split strategy
     "max_features": {
         "type": "mixed",  # Supports both categorical and numerical
