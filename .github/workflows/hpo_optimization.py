@@ -13,19 +13,17 @@ def load_script(script_path):
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
-  
-def get_categorical_options(param_name, model_name):
-      """Fetch the categorical options for a given parameter and model."""
-      model_options = PARAM_BOUNDS.get(model_name, {})
-      return model_options.get(param_name, None)
 
-def suggest_hyperparameter(trial, param_name, config):
+def suggest_hyperparameter(trial, param_name, config, model_name):
   """Suggest a hyperparameter based on its configuration."""
   if config["type"] == "int":
       return trial.suggest_int(param_name, *config["bounds"])
   elif config["type"] == "float":
       return trial.suggest_float(param_name, *config["bounds"])
   elif config["type"] == "categorical":
+      if isinstance(config["options"], dict) and model_name:
+          options = config["options"].get(model_name, [])
+          return trial.suggest_categorical(param_name, options)
       return trial.suggest_categorical(param_name, config["options"])
   elif config["type"] == "mixed":
       if "int_bounds" in config:
@@ -41,10 +39,11 @@ def objective(trial, script, X_train, X_test, y_train, y_test):
 
     # Suggest hyperparameters dynamically based on PARAM_BOUNDS
     params = model.get_params()
+    model_name = model_class.__name__
     suggested_params = {}
     for param_name, param_value in params.items():
       if param_name in PARAM_BOUNDS:
-          suggested_params[param_name] = suggest_hyperparameter(trial, param_name, PARAM_BOUNDS[param_name])
+          suggested_params[param_name] = suggest_hyperparameter(trial, param_name, PARAM_BOUNDS[param_name], model_name)
       elif not ignore_param(param_name):
         print("WARNING: Unrecognized hyperparameter: " + param_name)
         suggested_params[param_name] = param_value
@@ -68,7 +67,7 @@ def run_hpo(script_path):
     X, y = script.get_data()
 
     # Split into train and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=101)
     
     study = optuna.create_study(direction="maximize")
     study.optimize(lambda trial: objective(trial, script, X_train, X_test, y_train, y_test), n_trials=50, n_jobs=-1)
