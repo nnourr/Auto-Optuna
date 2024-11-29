@@ -10,7 +10,7 @@ def get_data():
 
 def get_model():
     """Returns an uninitialized model."""
-    return DecisionTreeClassifier  # Notice, we return the class, not an instance.
+    return RandomForestClassifier  # Notice, we return the class, not an instance.
 
 def train_baseline():
   X, y = get_data()
