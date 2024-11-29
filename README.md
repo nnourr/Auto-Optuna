@@ -58,7 +58,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Run Hyperparameter Optimization
-      uses: your-username/your-repo-name@v1.0
+      uses: nnourr/Auto-Optuna@1.2
       with:
         script_path: "scripts/my_model.py"
         get_data_method: "get_data"
