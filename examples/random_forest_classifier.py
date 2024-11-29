@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score, check_scoring, r2_score
 
 def get_data():
     """Fetches preprocessed data."""
-    return datasets.fetch_california_housing(return_X_y=True)
+    return datasets.load_breast_cancer(return_X_y=True)
 
 def get_model():
     """Returns an uninitialized model."""
