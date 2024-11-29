@@ -1,5 +1,5 @@
-name: Auto Hyperparameter Optimization with Optuna
-description: A GitHub Action to perform hyperparameter optimization on a Python model.
+name: AutoOptuna
+description: A GitHub Action to perform hyperparameter optimization on a Python model using Optuna.
 author: Noureldeen Ahmed
 inputs:
   script_path:
