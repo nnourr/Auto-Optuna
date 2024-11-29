@@ -1,7 +1,7 @@
 import importlib.util
 import optuna
 from sklearn.base import is_classifier
-from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.metrics import accuracy_score, r2_score
 import os
 
 from sklearn.model_selection import train_test_split
@@ -37,7 +37,7 @@ def objective(trial, script, X_train, X_test, y_train, y_test):
     # Fetch data and uninitialized model dynamically from the script
     model_class = script.get_model()
     model = model_class()  # Instantiate the model
-    scorer = accuracy_score if is_classifier(model_class) else mean_squared_error
+    scorer = accuracy_score if is_classifier(model_class) else r2_score
 
     # Suggest hyperparameters dynamically based on PARAM_BOUNDS
     params = model.get_params()
@@ -71,9 +71,8 @@ def run_hpo(script_path):
     # Split into train and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=101)
     model_class = script.get_model()
-    direction = "maximize" if is_classifier(model_class) else "minimize"
     
-    study = optuna.create_study(direction=direction)
+    study = optuna.create_study(direction="maximize")
     study.optimize(lambda trial: objective(trial, script, X_train, X_test, y_train, y_test), n_trials=50, n_jobs=-1)
 
     # Train the final model with best hyperparameters
