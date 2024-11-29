@@ -38,3 +38,7 @@ runs:
     - "${{ inputs.n_trials }}"
     - "${{ inputs.n_jobs }}"
     - "${{ inputs.artifact_name }}"
+
+branding:
+  icon: graph
+  color: green
