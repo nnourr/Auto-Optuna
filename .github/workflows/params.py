@@ -4,13 +4,13 @@ PARAM_BOUNDS = {
     "max_depth": {"type": "int", "bounds": [1, 100]},  # Maximum depth of the tree
     "min_samples_split": {
         "type": "float",  # Supports both int and float
-        "float_bounds": [0.01, 1.0],  # Fraction of samples (0.01–1.0)
+        "bounds": [0.01, 1.0],  # Fraction of samples (0.01–1.0)
     },
     "min_samples_leaf": {
         "type": "float",  # Supports both int and float
-        "float_bounds": [0.01, 0.5],  # Fraction of samples (0.01–0.5)
+        "bounds": [0.01, 0.5],  # Fraction of samples (0.01–0.5)
     },
-    "max_samples": {"type":"float", "float_bounds": [0.01, 1.0]},
+    "max_samples": {"type":"float", "bounds": [0.01, 1.0]},
     "min_weight_fraction_leaf": {"type": "float", "bounds": [0.0, 0.5]},  # Fraction of total weights
     "max_leaf_nodes": {"type": "int", "bounds": [2, 1000]},  # Maximum number of leaf nodes
     "min_impurity_decrease": {"type": "float", "bounds": [0.0, 1.0]},  # Impurity threshold
