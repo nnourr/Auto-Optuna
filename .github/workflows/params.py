@@ -3,15 +3,14 @@ PARAM_BOUNDS = {
     "n_estimators": {"type": "int", "bounds": [10, 300]},  # Number of trees in the forest
     "max_depth": {"type": "int", "bounds": [1, 100]},  # Maximum depth of the tree
     "min_samples_split": {
-        "type": "mixed",  # Supports both int and float
-        "int_bounds": [2, 20],
+        "type": "float",  # Supports both int and float
         "float_bounds": [0.01, 1.0],  # Fraction of samples (0.01–1.0)
     },
     "min_samples_leaf": {
-        "type": "mixed",  # Supports both int and float
-        "int_bounds": [1, 20],
+        "type": "float",  # Supports both int and float
         "float_bounds": [0.01, 0.5],  # Fraction of samples (0.01–0.5)
     },
+    "max_samples": {"type":"float", "float_bounds": [0.01, 1.0]},
     "min_weight_fraction_leaf": {"type": "float", "bounds": [0.0, 0.5]},  # Fraction of total weights
     "max_leaf_nodes": {"type": "int", "bounds": [2, 1000]},  # Maximum number of leaf nodes
     "min_impurity_decrease": {"type": "float", "bounds": [0.0, 1.0]},  # Impurity threshold
