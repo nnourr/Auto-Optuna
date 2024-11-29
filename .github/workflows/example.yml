@@ -1,0 +1,36 @@
+name: Example Usage
+
+on:
+  workflow_dispatch:  # Allows manual triggering with custom input
+    inputs:
+      script_path:
+        description: "Path to the script that provides data and model"
+        required: false  # Make it optional
+        default: ""  # No default when run manually
+
+  push:  # Automatically trigger on push
+    branches:
+      - main
+
+jobs:
+  hpo-test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Run HPO Action
+      uses: ./  # This points to the local action in the repository
+      with:
+        script_path: "./examples/random_forrest_classifier.py"
+        get_data_method: "get_data"
+        get_model_method: "get_model"
+        n_trials: 70
+        artifact_name: "optimized_random_forrest_model.pkl"
+
+    - name: Upload Optimized Model Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: optimized_random_forrest_model
+        path: optimized_random_forrest_model.pkl
+  

@@ -1,0 +1,40 @@
+name: Auto Hyperparameter Optimization with Optuna
+description: A GitHub Action to perform hyperparameter optimization on a Python model.
+author: Noureldeen Ahmed
+inputs:
+  script_path:
+    description: "Path to the script with get_data and get_model methods"
+    required: true
+  get_data_method:
+    description: "Name of the method to fetch the dataset"
+    required: false
+    default: "get_data"
+  get_model_method:
+    description: "Name of the method to fetch the model"
+    required: false
+    default: "get_model"
+  n_trials:
+    description: "Number of trials for hyperparameter optimization"
+    required: false
+    default: "50"
+  artifact_name:
+    description: "Name of the artifact output for the optimized model."
+    required: false
+    default: "optimized_model.pkl"
+
+outputs:
+  best_params:
+    description: "Best hyperparameters found during optimization."
+  best_accuracy:
+    description: "Best accuracy achieved during optimization."
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - "${{ inputs.script_path }}"
+    - "${{ inputs.get_data_method }}"
+    - "${{ inputs.get_model_method }}"
+    - "${{ inputs.n_trials }}"
+    - "${{ inputs.n_jobs }}"
+    - "${{ inputs.artifact_name }}"

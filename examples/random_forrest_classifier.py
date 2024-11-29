@@ -11,7 +11,7 @@ def get_data():
 
 def get_model():
     """Returns an uninitialized model."""
-    return DecisionTreeRegressor
+    return RandomForestClassifier
 
 def train_baseline():
   X, y = get_data()

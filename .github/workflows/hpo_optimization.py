@@ -1,5 +1,6 @@
 import importlib.util
 import optuna
+from pathlib import Path
 from sklearn.base import is_classifier
 from sklearn.metrics import accuracy_score, r2_score
 import os
@@ -8,12 +9,17 @@ from sklearn.model_selection import train_test_split
 
 from params import PARAM_BOUNDS, validate_hyperparameters, ignore_param
 
-def load_script(script_path):
-    """Dynamically load a Python module from a given path."""
+def load_script(script_path, get_data_method, get_model_method):
+    """Dynamically load a Python module and fetch specified methods."""
     spec = importlib.util.spec_from_file_location("script_module", script_path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module
+
+    # Fetch the methods dynamically
+    get_data = getattr(module, get_data_method)
+    get_model = getattr(module, get_model_method)
+
+    return {"get_data": get_data, "get_model": get_model}
 
 def suggest_hyperparameter(trial, param_name, config, model_name):
   """Suggest a hyperparameter based on its configuration."""
@@ -35,7 +41,7 @@ def suggest_hyperparameter(trial, param_name, config, model_name):
 def objective(trial, script, X_train, X_test, y_train, y_test):
     """Objective function for hyperparameter optimization."""
     # Fetch data and uninitialized model dynamically from the script
-    model_class = script.get_model()
+    model_class = script["get_model"]()
     model = model_class()  # Instantiate the model
     scorer = accuracy_score if is_classifier(model_class) else r2_score
 
@@ -62,18 +68,19 @@ def objective(trial, script, X_train, X_test, y_train, y_test):
     return accuracy
 
 
-def run_hpo(script_path):
+def run_hpo(script_path, get_data_method, get_model_method, n_trials, artifact_name):
     """Run hyperparameter optimization with a dynamically loaded script."""
-    script = load_script(script_path)
-    # Get the full dataset
-    X, y = script.get_data()
+    script = load_script(script_path, get_data_method, get_model_method)
 
+    # Fetch data
+    X, y = script["get_data"]()
+    
     # Split into train and test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=101)
-    model_class = script.get_model()
+    model_class = script["get_model"]()
     
     study = optuna.create_study(direction="maximize")
-    study.optimize(lambda trial: objective(trial, script, X_train, X_test, y_train, y_test), n_trials=50, n_jobs=-1)
+    study.optimize(lambda trial: objective(trial, script, X_train, X_test, y_train, y_test), n_trials=n_trials, n_jobs=-1)
 
     # Train the final model with best hyperparameters
     best_params = study.best_params
@@ -82,7 +89,7 @@ def run_hpo(script_path):
     final_model.fit(X, y)
 
     # Save the model
-    with open("optimized_model.pkl", "wb") as f:
+    with open(artifact_name, "wb") as f:
         import pickle
         pickle.dump(final_model, f)
 
@@ -90,6 +97,10 @@ def run_hpo(script_path):
     print("Best Accuracy:", study.best_value)
 
 if __name__ == "__main__":
-    # Read script path from the environment variable
-    script_path = os.environ.get("SCRIPT_PATH", "model.py")
-    run_hpo(script_path)
+    script_path = os.getenv("INPUT_SCRIPT_PATH")
+    get_data_method = os.getenv("INPUT_GET_DATA_METHOD", "get_data")
+    get_model_method = os.getenv("INPUT_GET_MODEL_METHOD", "get_model")
+    n_trials = int(os.getenv("INPUT_N_TRIALS", "20"))
+    artifact_name = os.getenv("INPUT_ARTIFACT_NAME", "optimized_model.pkl")
+
+    run_hpo(script_path, get_data_method, get_model_method, n_trials, artifact_name)
