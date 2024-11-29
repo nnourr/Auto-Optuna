@@ -26,12 +26,14 @@ PARAM_BOUNDS = {
         "options": {
             "DecisionTreeClassifier": ["gini", "entropy", "log_loss"],
             "DecisionTreeRegressor": ["squared_error", "friedman_mse", "absolute_error", "poisson"],
+            "RandomForestClassifier": ["gini", "entropy", "log_loss"]
         },
     },  # Split quality function
     "class_weight": {
         "type": "categorical",
         "options": {
             "DecisionTreeClassifier": ["balanced", None],  # Only applicable to classifiers
+            "RandomForestClassifier":["balanced", "balanced_subsample", None]
         },
     },  # Class weights
     "splitter": {"type": "categorical", "options": ["best", "random"]},  # Split strategy
