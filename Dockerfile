@@ -11,4 +11,4 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Add the entrypoint for the action
-ENTRYPOINT ["python", "/app/.github/workflows/hpo_optimization.py"]
+ENTRYPOINT ["python", "/app/.hpo_optimization.py"]
