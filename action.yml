@@ -40,5 +40,5 @@ runs:
     - "${{ inputs.artifact_name }}"
 
 branding:
-  icon: graph
-  color: green
+  icon: radio
+  color: blue
